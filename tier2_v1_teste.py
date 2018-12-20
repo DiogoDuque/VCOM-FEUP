@@ -1,0 +1,151 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Dec 20 08:16:26 2018
+
+@author: Joana Rocha
+"""
+import cv2
+from glob import glob
+from xml.dom import minidom
+
+#KERAS
+from keras.models import Sequential
+from keras.layers.core import Dense, Dropout, Activation, Flatten
+from keras.layers.convolutional import Convolution2D, MaxPooling2D
+from keras.optimizers import SGD,RMSprop,adam
+from keras.utils import np_utils
+
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib
+import os, sys
+#import theano
+from PIL import Image
+from numpy import *
+# SKLEARN
+from sklearn.utils import shuffle
+from sklearn.cross_validation import train_test_split
+
+# input image dimensions
+img_rows, img_cols = 200, 200
+
+# number of channels
+img_channels = 3
+
+#%% READ IMAGES AND RESIZE THEM
+
+#path1 = 'C:/Users/Joana Rocha/Documents/GitHub/VCOM-FEUP/camara'    #path of folder of images 
+path1 = 'camara'   
+path2 = 'musica' 
+path3 = 'serralves'
+path4 = 'clerigos'
+path5 = 'arrabida'  
+
+
+
+images1 = glob(os.path.join(path1, '*.jpg'))
+images1 = images1 + glob(os.path.join(path1, '*.jpeg'))
+images1 = images1 + glob(os.path.join(path1, '*.png'))
+images2 = glob(os.path.join(path2, '*.jpg'))
+images2 = images2 + glob(os.path.join(path2, '*.jpeg'))
+images2 = images2 + glob(os.path.join(path2, '*.png'))
+#images3 = glob(os.path.join(path3, '*.jpg'))
+#images3 = images3 + glob(os.path.join(path3, '*.jpeg'))
+#images3 = images3 + glob(os.path.join(path3, '*.png'))
+#images4 = glob(os.path.join(path4, '*.jpg'))
+#images4 = images4 + glob(os.path.join(path5, '*.jpeg'))
+#images4 = images4 + glob(os.path.join(path5, '*.png'))
+#images5 = glob(os.path.join(path5, '*.jpg'))
+#images5 = images5 + glob(os.path.join(path5, '*.jpeg'))
+#images5 = images5 + glob(os.path.join(path5, '*.png'))
+
+def proc_images(images,img_rows,img_cols):
+    #Returns  array x of resized images: 
+
+    x = []
+
+    for img in images:
+        base = os.path.basename(img)
+    # Read and resize image
+        full_size_image = cv2.imread(img)
+    #x.append(full_size_image)
+        x.append(cv2.resize(full_size_image, (img_cols,img_rows), interpolation=cv2.INTER_CUBIC))
+
+    return x
+
+resized1 = proc_images(images1,img_rows,img_cols)
+resized2 = proc_images(images2,img_rows,img_cols)
+#resized3 = proc_images(images3,img_rows,img_cols)
+#resized4 = proc_images(images4,img_rows,img_cols)
+#resized5 = proc_images(images5,img_rows,img_cols)
+
+#%% BUILD MATRIX WITH IMAGES AND GET LABELS
+num_samples=len(resized1) + len(resized2) #+ len(resized3) + len(resized4) + len(resized5)
+
+# Create list to store all images
+train_images = resized1 + resized2 #+ resized3 + resized4 + resized5
+
+# Create list to match images
+train_labels = [None] * num_samples
+for i in range(0,len(resized1)):
+    train_labels[i] = path1
+for i in range(len(resized1),len(resized1)+len(resized2)):
+    train_labels[i] = path2
+#for i in range(len(resized1)+len(resized2),len(resized1)+len(resized2)+len(resized3)):
+#    train_labels[i] = path3
+#for i in range(len(resized1)+len(resized2)+len(resized3),len(resized1)+len(resized2)+len(resized3)+len(resized4)):
+#    train_labels[i] = path4
+#for i in range(len(resized1)+len(resized2)+len(resized3)+len(resized4),len(resized1)+len(resized2)+len(resized3)+len(resized4)+len(resized5)):
+#    train_labels[i] = path5
+
+train_images = np.asarray(train_images)
+train_labels = np.asarray(train_labels)
+
+#%% GET BOUDING BOX COORDINATES
+
+class Annotation:
+    filename = ''
+    width = -1
+    height = -1
+    depth = -1
+    #segmented
+    pose = ''
+    #truncated
+    xmin = -1
+    xmax = -1
+    ymin = -1
+    ymax = -1
+    def toString(self):
+        return ("filename: "+self.filename+", width: "+self.width+", height: "+self.height
+        +", depth: "+self.depth+", pose: "+self.pose+", xmin: "+self.xmin+", xmax: "+self.xmax
+        +", ymin: "+self.ymin+", ymax: "+self.ymax)
+
+classes = ["arrabida", "camara", "clerigos", "musica", "serralves"]
+
+def _getTextFromXmlTag(xmldoc, tagname):
+    elem = xmldoc.getElementsByTagName(tagname)[0]
+    rc = []
+    for node in elem.childNodes:
+        if node.nodeType == node.TEXT_NODE:
+            rc.append(node.data)
+    return ''.join(rc)
+
+def _parseXmlFiles(files_infos):
+    results = []
+    for filename in files_infos:
+        xmldoc = minidom.parse(filename)
+        a = Annotation()
+        a.filename = _getTextFromXmlTag(xmldoc, "filename")
+        a.width = _getTextFromXmlTag(xmldoc, "width")
+        a.height = _getTextFromXmlTag(xmldoc, "height")
+        a.depth = _getTextFromXmlTag(xmldoc, "depth")
+        a.pose = _getTextFromXmlTag(xmldoc, "pose")
+        a.xmin = _getTextFromXmlTag(xmldoc, "xmin")
+        a.xmax = _getTextFromXmlTag(xmldoc, "xmax")
+        a.ymin = _getTextFromXmlTag(xmldoc, "ymin")
+        a.ymax = _getTextFromXmlTag(xmldoc, "ymax")
+        results.append(a)
+    return results
+
+def getXmlFilesAnnotations():
+    return _parseXmlFiles(_getXmlFilenames(classes))
