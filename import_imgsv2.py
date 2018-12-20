@@ -40,7 +40,7 @@ path3 = 'serralves'
 path4 = 'clerigos'
 path5 = 'arrabida'  
 
-
+#images1=glob(path1+'/'+ '*.')
 images1 = glob(os.path.join(path1, '*.jpg'))
 images2 = glob(os.path.join(path2, '*.jpg'))
 images3 = glob(os.path.join(path3, '*.jpg'))
@@ -86,41 +86,6 @@ for i in range(len(resized1)+len(resized2)+len(resized3),len(resized1)+len(resiz
 for i in range(len(resized1)+len(resized2)+len(resized3)+len(resized4),len(resized1)+len(resized2)+len(resized3)+len(resized4)+len(resized5)):
     train_labels[i] = path5
 
-train_data = [train_images,train_labels]
-#
-#img=immatrix[167].reshape(img_rows,img_cols)
-#plt.imshow(img)
-#plt.imshow(img,cmap='gray')
-#print (train_data[0].shape)
-#print (train_data[1].shape)
-#
-#
-##%%
-#(X, y) = (train_data[0],train_data[1])
-#
-#
-## STEP 1: split X and y into training and testing sets
-#
-#X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=4)
-#
-#
-#X_train = X_train.reshape(X_train.shape[0], 1, img_rows, img_cols)
-#X_test = X_test.reshape(X_test.shape[0], 1, img_rows, img_cols)
-#
-#X_train = X_train.astype('float32')
-#X_test = X_test.astype('float32')
-#
-#X_train /= 255
-#X_test /= 255
-#
-#print('X_train shape:', X_train.shape)
-#print(X_train.shape[0], 'train samples')
-#print(X_test.shape[0], 'test samples')
-#
-## convert class vectors to binary class matrices
-#Y_train = np_utils.to_categorical(y_train, nb_classes)
-#Y_test = np_utils.to_categorical(y_test, nb_classes)
-#
-#i = 100
-#plt.imshow(X_train[i, 0], interpolation='nearest')
-#print("label : ", Y_train[i,:])
+train_images = np.asarray(train_images)
+train_labels = np.asarray(train_labels)
+
