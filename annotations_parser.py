@@ -134,6 +134,13 @@ def convertJsonToXmlFiles(filename):
         f2 = open(filename.split(".")[0]+".xml", "w")
         f2.write(xmlDoc.toprettyxml())
 
+
+
 # _displayAnnotationsString(getXmlFilesAnnotations())
-convertJsonToXmlFiles("VCOM-annotations.json")
+
+def main():
+    convertJsonToXmlFiles("VCOM-annotations.json")
+
+if __name__ == "__main__":
+    main()
 
