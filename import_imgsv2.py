@@ -40,12 +40,23 @@ path3 = 'serralves'
 path4 = 'clerigos'
 path5 = 'arrabida'  
 
-#images1=glob(path1+'/'+ '*.')
+
+
 images1 = glob(os.path.join(path1, '*.jpg'))
+images1 = images1 + glob(os.path.join(path1, '*.jpeg'))
+images1 = images1 + glob(os.path.join(path1, '*.png'))
 images2 = glob(os.path.join(path2, '*.jpg'))
+images2 = images2 + glob(os.path.join(path2, '*.jpeg'))
+images2 = images2 + glob(os.path.join(path2, '*.png'))
 images3 = glob(os.path.join(path3, '*.jpg'))
+images3 = images3 + glob(os.path.join(path3, '*.jpeg'))
+images3 = images3 + glob(os.path.join(path3, '*.png'))
 images4 = glob(os.path.join(path4, '*.jpg'))
+images4 = images4 + glob(os.path.join(path5, '*.jpeg'))
+images4 = images4 + glob(os.path.join(path5, '*.png'))
 images5 = glob(os.path.join(path5, '*.jpg'))
+images5 = images5 + glob(os.path.join(path5, '*.jpeg'))
+images5 = images5 + glob(os.path.join(path5, '*.png'))
 
 def proc_images(images,img_rows,img_cols):
     #Returns  array x of resized images: 
