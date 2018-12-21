@@ -140,11 +140,13 @@ def exampleAnnotations():
     for annotation in annotations:
         xmin = annotation.xmin
         ymin = annotation.ymin
+        bboxWidth = float(annotation.xmax) - float(xmin)
+        bboxHeight = float(annotation.ymax) - float(ymin)
         width = annotation.width
         height = annotation.height
         filename = annotation.filename
         label = filename.split("-")[0]
-        print(filename+" ("+label+"): top-left-corner=("+xmin+","+ymin+"), dims=("+width+","+height+")")
+        print(filename+" ("+label+"): top-left-corner=("+xmin+","+ymin+"), bboxDims=("+str(bboxWidth)+","+str(bboxHeight)+"), imgDims=("+width+","+height+")")
         print("===============")
 
 
