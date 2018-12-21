@@ -134,12 +134,25 @@ def convertJsonToXmlFiles(filename):
         f2 = open(filename.split(".")[0]+".xml", "w")
         f2.write(xmlDoc.toprettyxml())
 
+def exampleAnnotations():
+    print("===== ANOTACOES =====")
+    annotations = getXmlFilesAnnotations()
+    for annotation in annotations:
+        xmin = annotation.xmin
+        ymin = annotation.ymin
+        width = annotation.width
+        height = annotation.height
+        filename = annotation.filename
+        label = filename.split("-")[0]
+        print(filename+" ("+label+"): top-left-corner=("+xmin+","+ymin+"), dims=("+width+","+height+")")
+        print("===============")
 
 
 # _displayAnnotationsString(getXmlFilesAnnotations())
 
 def main():
-    convertJsonToXmlFiles("VCOM-annotations.json")
+    #convertJsonToXmlFiles("VCOM-annotations.json")
+    exampleAnnotations()
 
 if __name__ == "__main__":
     main()
