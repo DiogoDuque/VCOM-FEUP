@@ -36,7 +36,8 @@ def _getTextFromXmlTag(xmldoc, tagname):
 def _getXmlFilenames(dirs):
     filenames = []
     for dir in dirs:
-        dir_path = os.path.join("annotations", dir)
+        cwd = os.path.dirname(os.path.realpath(__file__))
+        dir_path = os.path.join(cwd, "annotations", dir)
         for filename in os.listdir(dir_path):
             if filename.endswith(".xml"):
                 filenames.append(os.path.join(dir_path, filename))
