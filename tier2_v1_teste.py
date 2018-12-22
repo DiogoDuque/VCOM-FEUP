@@ -27,6 +27,8 @@ from sklearn.utils import shuffle
 from sklearn.cross_validation import train_test_split
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 
+from annotations_parser import getXmlFilesAnnotations, convertXmlAnnotationsToArray
+
 # input image dimensions
 img_rows, img_cols = 200, 200
 
@@ -106,57 +108,15 @@ train_labels = np.asarray(train_labels)
 
 #%% GET BOUDING BOX COORDINATES
 
-class Annotation:
-    filename = ''
-    width = -1
-    height = -1
-    depth = -1
-    #segmented
-    pose = ''
-    #truncated
-    xmin = -1
-    xmax = -1
-    ymin = -1
-    ymax = -1
-    def toString(self):
-        return ("filename: "+self.filename+", width: "+self.width+", height: "+self.height
-        +", depth: "+self.depth+", pose: "+self.pose+", xmin: "+self.xmin+", xmax: "+self.xmax
-        +", ymin: "+self.ymin+", ymax: "+self.ymax)
-
-classes = ["arrabida", "camara", "clerigos", "musica", "serralves"]
-
-def _getTextFromXmlTag(xmldoc, tagname):
-    elem = xmldoc.getElementsByTagName(tagname)[0]
-    rc = []
-    for node in elem.childNodes:
-        if node.nodeType == node.TEXT_NODE:
-            rc.append(node.data)
-    return ''.join(rc)
-
-def _parseXmlFiles(files_infos):
-    results = []
-    for filename in files_infos:
-        xmldoc = minidom.parse(filename)
-        a = Annotation()
-        a.filename = _getTextFromXmlTag(xmldoc, "filename")
-        a.width = _getTextFromXmlTag(xmldoc, "width")
-        a.height = _getTextFromXmlTag(xmldoc, "height")
-        a.depth = _getTextFromXmlTag(xmldoc, "depth")
-        a.pose = _getTextFromXmlTag(xmldoc, "pose")
-        a.xmin = _getTextFromXmlTag(xmldoc, "xmin")
-        a.xmax = _getTextFromXmlTag(xmldoc, "xmax")
-        a.ymin = _getTextFromXmlTag(xmldoc, "ymin")
-        a.ymax = _getTextFromXmlTag(xmldoc, "ymax")
-        results.append(a)
-    return results
-
-def getXmlFilesAnnotations():
-    return _parseXmlFiles(_getXmlFilenames(classes)) 
 
 # LER ANOTAÇOES E TIRAR X, Y, W e H DE CADA BBOX
 # ASSOCIAR CADA ANOTAÇAO A IMAGEM CORRESPONDENTE PELA MESMA ORDEM Q TRAIN IMAGES E TRAIN LABELS
 
-bboxes = getXmlFilesAnnotations()
+# substituir 'filenames' por uma lista dos ficheiros. a funcao tanto aceita nomes de ficheiros do tipo "camara/camara-0000.jpg" como só "camara-0000.jpg" :)
+filenames = ["camara/camara-0000.jpg", "camara/camara-0001.jpg", "camara-0002.jpg"]
+annotations = getXmlFilesAnnotations()
+bboxes = convertXmlAnnotationsToArray(annotations, filenames)
+print(bboxes)
 
 
 #%% ONE HOT VECTORS
