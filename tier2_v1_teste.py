@@ -25,6 +25,7 @@ from numpy import *
 # SKLEARN
 from sklearn.utils import shuffle
 from sklearn.cross_validation import train_test_split
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 
 # input image dimensions
 img_rows, img_cols = 200, 200
@@ -49,15 +50,15 @@ images1 = images1 + glob(os.path.join(path1, '*.png'))
 images2 = glob(os.path.join(path2, '*.jpg'))
 images2 = images2 + glob(os.path.join(path2, '*.jpeg'))
 images2 = images2 + glob(os.path.join(path2, '*.png'))
-#images3 = glob(os.path.join(path3, '*.jpg'))
-#images3 = images3 + glob(os.path.join(path3, '*.jpeg'))
-#images3 = images3 + glob(os.path.join(path3, '*.png'))
-#images4 = glob(os.path.join(path4, '*.jpg'))
-#images4 = images4 + glob(os.path.join(path5, '*.jpeg'))
-#images4 = images4 + glob(os.path.join(path5, '*.png'))
-#images5 = glob(os.path.join(path5, '*.jpg'))
-#images5 = images5 + glob(os.path.join(path5, '*.jpeg'))
-#images5 = images5 + glob(os.path.join(path5, '*.png'))
+images3 = glob(os.path.join(path3, '*.jpg'))
+images3 = images3 + glob(os.path.join(path3, '*.jpeg'))
+images3 = images3 + glob(os.path.join(path3, '*.png'))
+images4 = glob(os.path.join(path4, '*.jpg'))
+images4 = images4 + glob(os.path.join(path5, '*.jpeg'))
+images4 = images4 + glob(os.path.join(path5, '*.png'))
+images5 = glob(os.path.join(path5, '*.jpg'))
+images5 = images5 + glob(os.path.join(path5, '*.jpeg'))
+images5 = images5 + glob(os.path.join(path5, '*.png'))
 
 def proc_images(images,img_rows,img_cols):
     #Returns  array x of resized images: 
@@ -75,12 +76,12 @@ def proc_images(images,img_rows,img_cols):
 
 resized1 = proc_images(images1,img_rows,img_cols)
 resized2 = proc_images(images2,img_rows,img_cols)
-#resized3 = proc_images(images3,img_rows,img_cols)
-#resized4 = proc_images(images4,img_rows,img_cols)
-#resized5 = proc_images(images5,img_rows,img_cols)
+resized3 = proc_images(images3,img_rows,img_cols)
+resized4 = proc_images(images4,img_rows,img_cols)
+resized5 = proc_images(images5,img_rows,img_cols)
 
 #%% BUILD MATRIX WITH IMAGES AND GET LABELS
-num_samples=len(resized1) + len(resized2) #+ len(resized3) + len(resized4) + len(resized5)
+num_samples=len(resized1) + len(resized2) + len(resized3) + len(resized4) + len(resized5)
 
 # Create list to store all images
 train_images = resized1 + resized2 #+ resized3 + resized4 + resized5
@@ -91,15 +92,17 @@ for i in range(0,len(resized1)):
     train_labels[i] = path1
 for i in range(len(resized1),len(resized1)+len(resized2)):
     train_labels[i] = path2
-#for i in range(len(resized1)+len(resized2),len(resized1)+len(resized2)+len(resized3)):
-#    train_labels[i] = path3
-#for i in range(len(resized1)+len(resized2)+len(resized3),len(resized1)+len(resized2)+len(resized3)+len(resized4)):
-#    train_labels[i] = path4
-#for i in range(len(resized1)+len(resized2)+len(resized3)+len(resized4),len(resized1)+len(resized2)+len(resized3)+len(resized4)+len(resized5)):
-#    train_labels[i] = path5
+for i in range(len(resized1)+len(resized2),len(resized1)+len(resized2)+len(resized3)):
+    train_labels[i] = path3
+for i in range(len(resized1)+len(resized2)+len(resized3),len(resized1)+len(resized2)+len(resized3)+len(resized4)):
+    train_labels[i] = path4
+for i in range(len(resized1)+len(resized2)+len(resized3)+len(resized4),len(resized1)+len(resized2)+len(resized3)+len(resized4)+len(resized5)):
+    train_labels[i] = path5
 
 train_images = np.asarray(train_images)
 train_labels = np.asarray(train_labels)
+
+
 
 #%% GET BOUDING BOX COORDINATES
 
@@ -148,4 +151,29 @@ def _parseXmlFiles(files_infos):
     return results
 
 def getXmlFilesAnnotations():
-    return _parseXmlFiles(_getXmlFilenames(classes))
+    return _parseXmlFiles(_getXmlFilenames(classes)) 
+
+# LER ANOTAÇOES E TIRAR X, Y, W e H DE CADA BBOX
+# ASSOCIAR CADA ANOTAÇAO A IMAGEM CORRESPONDENTE PELA MESMA ORDEM Q TRAIN IMAGES E TRAIN LABELS
+
+bboxes = getXmlFilesAnnotations()
+
+
+#%% ONE HOT VECTORS
+
+label_encoder = LabelEncoder()
+valores_numericos = label_encoder.fit_transform(train_labels)  #string to num
+#label_encoder.inverse_transform() se quiser passar p str outra vez
+print(valores_numericos)
+
+onehot_encoder = OneHotEncoder(sparse=False)
+inteiros = valores_numericos.reshape(len(valores_numericos),1)
+train_labels = onehot_encoder.fit_transform(inteiros)
+
+print(train_labels)
+
+#%% DATA AUGMENTATION
+
+
+#%% CONCATENATE LABELS AND BBOXES
+train_labels_bbox = np.concatenate([bboxes / img_size, shapes], axis=-1).reshape(num_imgs, -1)
