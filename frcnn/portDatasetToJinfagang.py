@@ -21,7 +21,7 @@ imagesPaths = [os.path.join("..", path) for path in imagesPaths] # final adjuste
 
 # get annotations
 annotations = getXmlFilesAnnotations()
-bboxInfos, notFoundImgs = convertXmlAnnotationsToArray(annotations, imagesPaths, True)
+bboxInfos, notFoundImgs = convertXmlAnnotationsToArray(annotations, imagesPaths, False, True)
 
 # delete images without annotations
 for notFound in notFoundImgs:

@@ -154,7 +154,7 @@ def convertJsonToXmlFiles(filename):
         f2 = open(filename.split(".")[0]+".xml", "w")
         f2.write(xmlDoc.toprettyxml())
 
-def convertXmlAnnotationsToArray(xmlAnnotations, filenames, returnNotFound = False):
+def convertXmlAnnotationsToArray(xmlAnnotations, filenames, useWidthHeight = True, returnNotFound = False):
     bboxInfos = []
     notFoundImgs = []
     for searchFn in filenames:
@@ -165,9 +165,14 @@ def convertXmlAnnotationsToArray(xmlAnnotations, filenames, returnNotFound = Fal
             if searchFn == filename: # found a match
                 xmin = float(annotation.xmin)
                 ymin = float(annotation.ymin)
-                bboxWidth = float(annotation.xmax) - xmin
-                bboxHeight = float(annotation.ymax) - ymin
-                elem = [xmin, ymin, bboxWidth, bboxHeight]
+                xmax = float(annotation.xmax)
+                ymax = float(annotation.ymax)
+                bboxWidth = float(xmax) - xmin
+                bboxHeight = float(ymax) - ymin
+                if useWidthHeight:
+                    elem = [xmin, ymin, bboxWidth, bboxHeight]
+                else:
+                    elem = [xmin, ymin, xmax, ymax]
                 bboxInfos.append(elem)
                 found = True
                 break
