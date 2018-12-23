@@ -1,0 +1,27 @@
+﻿<?xml version="1.0"?>
+<annotation>
+    <folder>images</folder>
+    <filename>musica-0042.jpg</filename>
+    <path>images/musica-0042.jpg</path>
+    <source>
+        <database>Unknown</database>
+    </source>
+    <size>
+        <width>823</width>
+        <height>548</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>musica</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <bndbox>
+            <xmin>-2.499999999999999</xmin>
+            <ymin>59.99999999999998</ymin>
+            <xmax>784.9999999999998</xmax>
+            <ymax>497.49999999999983</ymax>
+        </bndbox>
+    </object>
+</annotation>

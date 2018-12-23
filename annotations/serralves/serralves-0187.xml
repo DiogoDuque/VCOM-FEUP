@@ -1,0 +1,27 @@
+﻿<?xml version="1.0"?>
+<annotation>
+    <folder>images</folder>
+    <filename>serralves-0187.jpg</filename>
+    <path>images/serralves-0187.jpg</path>
+    <source>
+        <database>Unknown</database>
+    </source>
+    <size>
+        <width>1024</width>
+        <height>671</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>unlabelled</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <bndbox>
+            <xmin>1.6666666666666665</xmin>
+            <ymin>84.99999999999999</ymin>
+            <xmax>1021.6666666666665</xmax>
+            <ymax>584.9999999999999</ymax>
+        </bndbox>
+    </object>
+</annotation>

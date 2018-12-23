@@ -1,0 +1,26 @@
+<annotation>
+    <folder>images</folder>
+    <filename>arrabida-0084.jpg</filename>
+    <path>images/arrabida-0084.jpg</path>
+    <source>
+        <database>Unknown</database>
+    </source>
+    <size>
+        <width>800</width>
+        <height>600</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>arrabida</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <bndbox>
+            <xmin>-1</xmin>
+            <ymin>3</ymin>
+            <xmax>800</xmax>
+            <ymax>377</ymax>
+        </bndbox>
+    </object>
+</annotation>
