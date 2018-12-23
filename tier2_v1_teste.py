@@ -84,7 +84,7 @@ resized5 = proc_images(images5,img_rows,img_cols)
 num_samples=len(resized1) + len(resized2) + len(resized3) + len(resized4) + len(resized5)
 
 # Create list to store all images
-train_images = resized1 + resized2 #+ resized3 + resized4 + resized5
+train_images = resized1 + resized2 + resized3 + resized4 + resized5
 
 # Create list to match images
 train_labels = [None] * num_samples
