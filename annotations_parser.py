@@ -36,7 +36,8 @@ def _getTextFromXmlTag(xmldoc, tagname):
 def _getXmlFilenames(dirs):
     filenames = []
     for dir in dirs:
-        dir_path = os.path.join("annotations", dir)
+        cwd = os.path.dirname(os.path.realpath(__file__))
+        dir_path = os.path.join(cwd, "annotations", dir)
         for filename in os.listdir(dir_path):
             if filename.endswith(".xml"):
                 filenames.append(os.path.join(dir_path, filename))
@@ -117,24 +118,10 @@ def _jsonToXml(jsonStr):
     return filename, xmlDoc
 
 ######
-# main functions
+# debug
 ######
 
-def _displayAnnotationsString(annotations):
-    for a in annotations:
-        print(a.toString())
-
-def getXmlFilesAnnotations():
-    return _parseXmlFiles(_getXmlFilenames(classes))
-
-def convertJsonToXmlFiles(filename):
-    f = open(filename, "r")
-    for line in f:
-        filename, xmlDoc = _jsonToXml(line)
-        f2 = open(filename.split(".")[0]+".xml", "w")
-        f2.write(xmlDoc.toprettyxml())
-
-def exampleAnnotations():
+def _exampleAnnotations():
     print("===== ANOTACOES =====")
     annotations = getXmlFilesAnnotations()
     for annotation in annotations:
@@ -149,12 +136,50 @@ def exampleAnnotations():
         print(filename+" ("+label+"): top-left-corner=("+xmin+","+ymin+"), bboxDims=("+str(bboxWidth)+","+str(bboxHeight)+"), imgDims=("+width+","+height+")")
         print("===============")
 
+def _displayAnnotationsString(annotations):
+    for a in annotations:
+        print(a.toString())
 
-# _displayAnnotationsString(getXmlFilesAnnotations())
+######
+# main functions
+######
+
+def getXmlFilesAnnotations():
+    return _parseXmlFiles(_getXmlFilenames(classes))
+
+def convertJsonToXmlFiles(filename):
+    f = open(filename, "r")
+    for line in f:
+        filename, xmlDoc = _jsonToXml(line)
+        f2 = open(filename.split(".")[0]+".xml", "w")
+        f2.write(xmlDoc.toprettyxml())
+
+def convertXmlAnnotationsToArray(xmlAnnotations, filenames):
+    finalArray = []
+    for searchFn in filenames:
+        searchFn = searchFn.split("/")[-1].split("\\")[-1]
+        for annotation in xmlAnnotations:
+            filename = annotation.filename
+            if searchFn == filename: # found a match
+                xmin = float(annotation.xmin)
+                ymin = float(annotation.ymin)
+                bboxWidth = float(annotation.xmax) - xmin
+                bboxHeight = float(annotation.ymax) - ymin
+                elem = [xmin, ymin, bboxWidth, bboxHeight]
+                finalArray.append(elem)
+                break
+    return finalArray
+
+
 
 def main():
-    #convertJsonToXmlFiles("VCOM-annotations.json")
-    exampleAnnotations()
+    convertJsonToXmlFiles("VCOM-annotations.json")
+    
+    #annotations = getXmlFilesAnnotations()
+    #convertXmlAnnotationsToArray(annotations, ["camara/camara-0000.jpg", "camara\\camara-0001.jpg", "camara-0002.jpg"])
+    
+    #_exampleAnnotations()
+    #_displayAnnotationsString(getXmlFilesAnnotations())
 
 if __name__ == "__main__":
     main()
