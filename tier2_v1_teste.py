@@ -66,24 +66,27 @@ def proc_images(images,img_rows,img_cols):
     #Returns  array x of resized images: 
 
     x = []
+    original_images = []
 
     for img in images:
         base = os.path.basename(img)
     # Read and resize image
         full_size_image = cv2.imread(img)
+        original_images.append(full_size_image)
     #x.append(full_size_image)
         x.append(cv2.resize(full_size_image, (img_cols,img_rows), interpolation=cv2.INTER_CUBIC))
 
-    return x
+    return x, original_images
 
-resized1 = proc_images(images1,img_rows,img_cols)
-resized2 = proc_images(images2,img_rows,img_cols)
-resized3 = proc_images(images3,img_rows,img_cols)
-resized4 = proc_images(images4,img_rows,img_cols)
-resized5 = proc_images(images5,img_rows,img_cols)
+resized1, original_images1 = proc_images(images1,img_rows,img_cols)
+resized2, original_images2 = proc_images(images2,img_rows,img_cols)
+resized3, original_images3 = proc_images(images3,img_rows,img_cols)
+resized4, original_images4 = proc_images(images4,img_rows,img_cols)
+resized5, original_images5 = proc_images(images5,img_rows,img_cols)
 
+original_images = original_images1 + original_images2 + original_images3 + original_images4 + original_images5
 #%% BUILD MATRIX WITH IMAGES AND GET LABELS
-num_samples=len(resized1) + len(resized2) + len(resized3) + len(resized4) + len(resized5)
+num_samples = len(resized1) + len(resized2) + len(resized3) + len(resized4) + len(resized5)
 
 # Create list to store all images
 train_images = resized1 + resized2 + resized3 + resized4 + resized5
@@ -118,6 +121,15 @@ annotations = getXmlFilesAnnotations()
 bboxes = convertXmlAnnotationsToArray(annotations, filenames)
 print(bboxes)
 
+#%% RESIZE BBOXES (TO MATCH RESIZED IMAGES)
+resized_bboxes = bboxes
+
+for i in range(len(original_images)):
+    resized_bboxes[i][0] = (bboxes[i][0] * img_rows) / (original_images[i][0]) #z
+    resized_bboxes[i][1] = (bboxes[i][1] * img_cols) / (original_images[i][1]) #w
+    resized_bboxes[i][2] = (bboxes[i][2] * img_cols) / (original_images[i][1]) #x
+    resized_bboxes[i][3] = (bboxes[i][3] * img_rows) / (original_images[i][0]) #y
+
 
 #%% ONE HOT VECTORS
 
@@ -136,4 +148,19 @@ print(train_labels)
 
 
 #%% CONCATENATE LABELS AND BBOXES
-train_labels_bbox = np.concatenate([bboxes / img_size, shapes], axis=-1).reshape(num_imgs, -1)
+train_labels_bbox = np.concatenate([bboxes, train_labels], axis=-1).reshape(num_samples, -1)
+print(train_labels_bbox.shape)
+
+#%% MODEL
+
+i = int(0.8 * num_samples)
+training_images = train_images[:i] #divide as imagens em train e test
+testing_images = train_images[i:]
+training_y = train_labels_bbox[:i]
+testing_y = train_labels_bbox[i:]
+test_bboxes = bboxes[i:]
+
+model = Sequential()
+model.add(layers.Dense(1024, activation='relu'))
+model.add(layers.Dropout(0.4))
+model.add(layers.Dense(train_labels_bbox.shape[-1]))
