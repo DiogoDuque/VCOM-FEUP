@@ -106,8 +106,8 @@ for i in range(len(resized1)+len(resized2)+len(resized3),len(resized1)+len(resiz
 for i in range(len(resized1)+len(resized2)+len(resized3)+len(resized4),len(resized1)+len(resized2)+len(resized3)+len(resized4)+len(resized5)):
     train_labels[i] = path5
 
-train_images = np.asarray(train_images)
-train_labels = np.asarray(train_labels)
+#train_images = np.asarray(train_images)
+#train_labels = np.asarray(train_labels)
 
 
 
@@ -148,20 +148,71 @@ print(train_labels)
 
 #%% DATA AUGMENTATION
 
-rotated1 = resized1
+rotated1 = train_images
 rotated1_bbox = resized_bboxes[0:len(train_images)]
 rotated1_labels = train_labels[0:len(train_images)]
 #a) Flip 90 degrees
 for i in range(len(train_images)):
    rotated1[i] = imutils.rotate_bound(train_images[i], 90)
 
-rotated1_bbox[0]= img_rows - (resized_bboxes[1] + resized_bboxes[2])
-rotated1_bbox[1]=
+rotated1_bbox[0]= img_cols - (resized_bboxes[1] + resized_bboxes[2])
+rotated1_bbox[1]= resized_bboxes[0]
 rotated1_bbox[2]= resized_bboxes[3] #width
 rotated1_bbox[3]= resized_bboxes[2] #height
 
+rotated2 = train_images
+rotated2_bbox = resized_bboxes[0:len(train_images)]
+rotated2_labels = train_labels[0:len(train_images)]
+#b) Flip 180 degrees
+for i in range(len(train_images)):
+   rotated2[i] = imutils.rotate_bound(train_images[i], 180)
+
+rotated2_bbox[0]= img_rows -(resized_bboxes[0] + resized_bboxes[3])
+rotated2_bbox[1]= img_cols - (resized_bboxes[1] + resized_bboxes[2])
+rotated2_bbox[2]= resized_bboxes[2]
+rotated2_bbox[3]= resized_bboxes[3]
+
+rotated3 = train_images
+rotated3_bbox = resized_bboxes[0:len(train_images)]
+rotated3_labels = train_labels[0:len(train_images)]
+#c) Flip 270 degrees
+for i in range(len(train_images)):
+   rotated2[i] = imutils.rotate_bound(train_images[i], 270)
+
+rotated3_bbox[0]= resized_bboxes[1]
+rotated3_bbox[1]= img_rows - (resized_bboxes[3] + resized_bboxes[0])
+rotated3_bbox[2]= resized_bboxes[3]
+rotated3_bbox[3]= resized_bboxes[2]
+
+
+higherintensity = train_images
+higherint_bboxes = resized_bboxes[0:len(train_images)]
+higherint_labels = train_labels[0:len(train_images)]
+#Somar 10 de intensidade
+for i in range(len(train_images)):
+    higherintensity[i] = train_images[i] + 10
+
+
+lowerintensity = train_images
+lowerint_bboxes = resized_bboxes[0:len(train_images)]
+lowerint_labels = train_labels[0:len(train_images)]
+#Subtrair 10 de intensidade
+for i in range(len(train_images)):
+    higherintensity[i] = train_images[i] - 10
+
+
+
+#%% JOIN ALL IMAGES
+all_train_images = train_images + rotated1 + rotated2 + rotated3 + higherintensity + lowerintensity
+all_train_labels = train_labels + rotated1_labels + rotated2_labels + rotated3_labels + higherint_labels + lowerint_labels
+all_train_bboxes = resized_bboxes + rotated1_bbox + rotated2_bbox + rotated3_bbox + higherint_bboxes + lowerint_bboxes
+
+all_train_images = np.asarray(all_train_images)
+all_train_labels = np.asarray(all_train_labels)
+all_train_bboxes = np.asarray(all_train_bboxes)
+
 #%% CONCATENATE LABELS AND BBOXES
-train_labels_bbox = np.concatenate([bboxes, train_labels], axis=-1).reshape(num_samples, -1)
+all_train_labels_bbox = np.concatenate([all_train_bboxes, all_train_labels], axis=-1).reshape(num_samples, -1)
 print(train_labels_bbox.shape)
 
 #%% MODEL
