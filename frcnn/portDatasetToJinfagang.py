@@ -1,4 +1,5 @@
 import os
+import random
 import numpy as np
 from glob import glob
 import sys
@@ -37,11 +38,27 @@ imagesLabels = np.reshape(imagesLabels, [len(imagesLabels), 1])
 datasetLines = np.concatenate((imagesPaths, bboxInfos), axis=1)
 datasetLines = np.concatenate((datasetLines, imagesLabels), axis=1)
 
-# write to jinfang dataset file
+# prepare as strings
 datasetLinesStr = []
 for line in datasetLines:
     datasetLinesStr.append(','.join(line))
 
+# separate into train and test
+print(len(datasetLinesStr))
+random.seed()
+lenTestElems = int(0.2*len(datasetLinesStr))
+testDataset = []
+for i in range(lenTestElems):
+    index = random.randint(0, len(datasetLinesStr))
+    elem = datasetLinesStr[index]
+    testDataset.append(elem)
+    del datasetLinesStr[index]
+trainDataset = datasetLinesStr
+
+# write to files
 with open(os.path.join('keras_frcnn-jinfagang','kitti_simple_label.txt'), 'w') as f:
-    for line in datasetLinesStr:
+    for line in trainDataset:
+        f.write("%s\n" % line)
+with open(os.path.join('keras_frcnn-jinfagang','kitti_simple_label_test.txt'), 'w') as f:
+    for line in testDataset:
         f.write("%s\n" % line)
