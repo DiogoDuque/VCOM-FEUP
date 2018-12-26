@@ -131,11 +131,12 @@ def predict_single_image(img_path, model_rpn, model_classifier_only, cfg, class_
             print('{} prob: {}'.format(b[0: 4], b[-1]))
     img = draw_boxes_and_label_on_image_cv2(img, class_mapping, boxes)
     print('Elapsed time = {}'.format(time.time() - st))
-    cv2.imshow('image', img)
+    #cv2.imshow('image', img)
     result_path = './results_images/{}.png'.format(os.path.basename(img_path).split('.')[0])
     print('result saved into ', result_path)
     cv2.imwrite(result_path, img)
-    cv2.waitKey(0)
+    #cv2.waitKey(0)
+    return boxes
 
 
 def predict(args_):
@@ -186,7 +187,7 @@ def predict(args_):
                                  model_classifier_only, cfg, class_mapping)
     elif os.path.isfile(path):
         print('predict image from {}'.format(path))
-        predict_single_image(path, model_rpn, model_classifier_only, cfg, class_mapping)
+        return predict_single_image(path, model_rpn, model_classifier_only, cfg, class_mapping)
 
 
 def parse_args():
