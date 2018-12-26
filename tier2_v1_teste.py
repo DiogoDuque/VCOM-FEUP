@@ -217,14 +217,14 @@ print(train_labels_bbox.shape)
 
 #%% MODEL
 
-i = int(0.8 * num_samples)
-training_images = train_images[:i] #divide as imagens em train e test
-testing_images = train_images[i:]
-training_y = train_labels_bbox[:i]
-testing_y = train_labels_bbox[i:]
-test_bboxes = bboxes[i:]
-
-model = Sequential()
-model.add(layers.Dense(1024, activation='relu'))
-model.add(layers.Dropout(0.4))
-model.add(layers.Dense(train_labels_bbox.shape[-1]))
+#i = int(0.8 * num_samples)
+#training_images = train_images[:i] #divide as imagens em train e test
+#testing_images = train_images[i:]
+#training_y = all_train_labels_bbox[:i]
+#testing_y = all_train_labels_bbox[i:]
+#test_bboxes = bboxes[i:]
+#
+#model = Sequential()
+#model.add(layers.Dense(1024, activation='relu'))
+#model.add(layers.Dropout(0.4))
+#model.add(layers.Dense(train_labels_bbox.shape[-1]))
