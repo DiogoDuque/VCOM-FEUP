@@ -54,6 +54,6 @@ for i in range(0, len(testImgs)):
                 misses += 1
             break
 
-print("Hits: {0!s}({1!s}%), Undetected: {5!s}({6!s}%), Misses: {2!s}({3!s}%), Imgs processed: {4!s}",
-hits, 100*hits/len(testImgs), misses, 100*misses/len(testImgs), len(testImgs), undetected, 100*undetected/len(testImgs))
+print("Hits: %d(%.2f%%), Undetected: %d(%.2f%%), Misses: %d(%.2f%%), Imgs processed: %d" %
+(hits, 100*hits/len(testImgs), undetected, 100*undetected/len(testImgs), misses, 100*misses/len(testImgs), len(testImgs)))
 
