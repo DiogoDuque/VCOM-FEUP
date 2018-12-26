@@ -118,7 +118,7 @@ train_labels = np.asarray(train_labels)
 # substituir 'filenames' por uma lista dos ficheiros. a funcao tanto aceita nomes de ficheiros do tipo "camara/camara-0000.jpg" como só "camara-0000.jpg" :)
 filenames = ["camara/camara-0000.jpg", "camara/camara-0001.jpg", "camara-0002.jpg"]
 annotations = getXmlFilesAnnotations()
-bboxes = convertXmlAnnotationsToArray(annotations, filenames)
+bboxes = convertXmlAnnotationsToArray(annotations, filenames, True, False, True)
 print(bboxes)
 
 #%% RESIZE BBOXES (TO MATCH RESIZED IMAGES)
