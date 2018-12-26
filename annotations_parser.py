@@ -158,8 +158,8 @@ def convertXmlAnnotationsToArray(xmlAnnotations, filenames,
 useWidthHeight = True, returnNotFound = False, swapXY = False):
     bboxInfos = []
     notFoundImgs = []
-    for searchFn in filenames:
-        searchFn = searchFn.split("/")[-1].split("\\")[-1]
+    for searchFnOriginal in filenames:
+        searchFn = searchFnOriginal.split("/")[-1].split("\\")[-1]
         found = False
         for annotation in xmlAnnotations:
             filename = annotation.filename
@@ -183,6 +183,8 @@ useWidthHeight = True, returnNotFound = False, swapXY = False):
                 break
         if not found:
             notFoundImgs.append(searchFn)
+            filenames.remove(searchFnOriginal)
+
     if len(notFoundImgs) != 0:
         print("###################")
         print("# WARNING: "+str(len(notFoundImgs))+" images with no corresponding annotation found")
