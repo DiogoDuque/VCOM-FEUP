@@ -7,6 +7,8 @@ Created on Thu Dec 20 08:16:26 2018
 import cv2
 from glob import glob
 from xml.dom import minidom
+import argparse
+import imutils
 
 #KERAS
 from keras.models import Sequential
@@ -146,6 +148,17 @@ print(train_labels)
 
 #%% DATA AUGMENTATION
 
+rotated1 = resized1
+rotated1_bbox = resized_bboxes[0:len(train_images)]
+rotated1_labels = train_labels[0:len(train_images)]
+#a) Flip 90 degrees
+for i in range(len(train_images)):
+   rotated1[i] = imutils.rotate_bound(train_images[i], 90)
+
+rotated1_bbox[0]= img_rows - (resized_bboxes[1] + resized_bboxes[2])
+rotated1_bbox[1]=
+rotated1_bbox[2]= resized_bboxes[3] #width
+rotated1_bbox[3]= resized_bboxes[2] #height
 
 #%% CONCATENATE LABELS AND BBOXES
 train_labels_bbox = np.concatenate([bboxes, train_labels], axis=-1).reshape(num_samples, -1)
