@@ -1,0 +1,27 @@
+﻿<?xml version="1.0"?>
+<annotation>
+    <folder>images</folder>
+    <filename>arrabida-0500.jpg</filename>
+    <path>images/arrabida-0500.jpg</path>
+    <source>
+        <database>Unknown</database>
+    </source>
+    <size>
+        <width>1600</width>
+        <height>1067</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>unlabelled</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <bndbox>
+            <xmin>33.99999999999999</xmin>
+            <ymin>271.99999999999994</ymin>
+            <xmax>1595.9999999999995</xmax>
+            <ymax>573.9999999999999</ymax>
+        </bndbox>
+    </object>
+</annotation>

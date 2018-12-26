@@ -1,0 +1,27 @@
+﻿<?xml version="1.0"?>
+<annotation>
+    <folder>images</folder>
+    <filename>clerigos-0417.jpg</filename>
+    <path>images/clerigos-0417.jpg</path>
+    <source>
+        <database>Unknown</database>
+    </source>
+    <size>
+        <width>5456</width>
+        <height>3632</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>unlabelled</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <bndbox>
+            <xmin>569.9999999999992</xmin>
+            <ymin>1789.9999999999975</ymin>
+            <xmax>4889.999999999993</xmax>
+            <ymax>2769.9999999999964</ymax>
+        </bndbox>
+    </object>
+</annotation>

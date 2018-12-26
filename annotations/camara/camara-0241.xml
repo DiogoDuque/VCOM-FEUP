@@ -1,0 +1,27 @@
+﻿<?xml version="1.0"?>
+<annotation>
+    <folder>images</folder>
+    <filename>camara-0241.jpg</filename>
+    <path>images/camara-0241.jpg</path>
+    <source>
+        <database>Unknown</database>
+    </source>
+    <size>
+        <width>1300</width>
+        <height>866</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>unlabelled</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <bndbox>
+            <xmin>488.5714721679687</xmin>
+            <ymin>139.99999999999997</ymin>
+            <xmax>838.5714285714284</xmax>
+            <ymax>519.9999999999999</ymax>
+        </bndbox>
+    </object>
+</annotation>
