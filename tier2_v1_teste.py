@@ -118,7 +118,7 @@ for i in range(len(resized1)+len(resized2)+len(resized3)+len(resized4),len(resiz
 # ASSOCIAR CADA ANOTAÇAO A IMAGEM CORRESPONDENTE PELA MESMA ORDEM Q TRAIN IMAGES E TRAIN LABELS
 
 # substituir 'filenames' por uma lista dos ficheiros. a funcao tanto aceita nomes de ficheiros do tipo "camara/camara-0000.jpg" como só "camara-0000.jpg" :)
-filenames = ["camara/camara-0000.jpg", "camara/camara-0001.jpg", "camara-0002.jpg"]
+filenames = images1 + images2 + images3 + images4 + images5
 annotations = getXmlFilesAnnotations()
 bboxes = convertXmlAnnotationsToArray(annotations, filenames, True, False, True)
 print(bboxes)
