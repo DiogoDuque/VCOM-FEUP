@@ -13,9 +13,11 @@ import imutils
 #KERAS
 from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Activation, Flatten
+from keras.optimizers import SGD
 from keras.layers.convolutional import Convolution2D, MaxPooling2D
 from keras.optimizers import SGD,RMSprop,adam
 from keras.utils import np_utils
+from keras import layers
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -207,27 +209,29 @@ all_train_images = train_images + rotated1 + rotated2 + rotated3 + higherintensi
 all_train_labels = train_labels + rotated1_labels + rotated2_labels + rotated3_labels + higherint_labels + lowerint_labels
 all_train_bboxes = resized_bboxes + rotated1_bbox + rotated2_bbox + rotated3_bbox + higherint_bboxes + lowerint_bboxes
 
-#all_train_images = np.asarray(all_train_images)
-#all_train_labels = np.asarray(all_train_labels)
-#all_train_bboxes = np.asarray(all_train_bboxes)
+all_train_images = np.asarray(all_train_images)
+all_train_labels = np.asarray(all_train_labels)
+all_train_bboxes = np.asarray(all_train_bboxes)
 
 #%% CONCATENATE LABELS AND BBOXES
 all_train_labels_bbox = np.concatenate([all_train_bboxes, all_train_labels], axis=-1).reshape(num_samples, -1)
-print(train_labels_bbox.shape)
+
+reshaped_all_train_images = (all_train_images.reshape(num_samples, -1))
 
 #%% MODEL
 
 i = int(0.8 * num_samples)
-train_X = train_images[:i] #divide as imagens em train e val
-test_X = train_images[i:]
+train_X = reshaped_all_train_images[:i] #divide as imagens em train e val
+test_X = reshaped_all_train_images[i:]
 train_y = all_train_labels_bbox[:i]
 test_y = all_train_labels_bbox[i:]
 
 
 model = Sequential()
-model.add(layers.Dense(256, activation='relu'))
+model.add(layers.Dense(256, input_dim=reshaped_all_train_images.shape[-1]))
+model.add(Activation('relu'))
 model.add(layers.Dropout(0.4))
-model.add(layers.Dense(.shape[-1]))
+model.add(layers.Dense(all_train_labels_bbox.shape[-1]))
 # pass optimizer by name: default parameters will be used
 model.compile(loss='mean_squared_error', optimizer='sgd')
 
@@ -290,4 +294,15 @@ for epoch in range(num_epochs):
     print ('Flipped {} training samples ({} %)'.format(np.sum(flipped[:, epoch]), np.mean(flipped[:, epoch]) * 100.))
     print ('Mean IOU: {}'.format(np.mean(ious[:, epoch])))
     print ('Mean dist: {}'.format(np.mean(dists[:, epoch])))
-    print
+
+
+#%% Eval plots
+
+plt.plot(np.mean(ious, axis=0), label='Mean IOU')  # between predicted and assigned true bboxes
+plt.plot(np.mean(dists, axis=0), label='Mean distance')  # relative to image size
+plt.legend()
+plt.ylim(0, 1)
+
+
+
+
