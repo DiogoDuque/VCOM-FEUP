@@ -207,8 +207,14 @@ for i in range(len(train_images)):
 
 #%% JOIN ALL IMAGES
 all_train_images = train_images + rotated1 + rotated2 + rotated3 + higherintensity + lowerintensity
-all_train_labels = train_labels + rotated1_labels + rotated2_labels + rotated3_labels + higherint_labels + lowerint_labels
-all_train_bboxes = resized_bboxes + rotated1_bbox + rotated2_bbox + rotated3_bbox + higherint_bboxes + lowerint_bboxes
+L1 = (train_labels,rotated1_labels,rotated2_labels,rotated3_labels,higherint_labels,lowerint_labels)
+all_train_labels = np.vstack(L1)
+#all_train_labels = np.concatenate(train_labels,rotated1_labels) #,rotated2_labels,rotated3_labels,higherint_labels,lowerint_labels)
+
+L2 = (resized_bboxes,rotated1_bbox,rotated2_bbox,rotated3_bbox,higherint_bboxes,lowerint_bboxes)
+all_train_bboxes = np.vstack(L2)
+#all_train_bboxes = resized_bboxes + rotated1_bbox + rotated2_bbox + rotated3_bbox + higherint_bboxes + lowerint_bboxes
+
 
 all_train_images = np.asarray(all_train_images)
 all_train_labels = np.asarray(all_train_labels)
