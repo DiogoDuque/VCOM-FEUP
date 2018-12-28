@@ -225,9 +225,9 @@ test_y = all_train_labels_bbox[i:]
 
 
 model = Sequential()
-model.add(layers.Dense(1024, activation='relu'))
+model.add(layers.Dense(256, activation='relu'))
 model.add(layers.Dropout(0.4))
-model.add(layers.Dense(train_labels_bbox.shape[-1]))
+model.add(layers.Dense(.shape[-1]))
 # pass optimizer by name: default parameters will be used
 model.compile(loss='mean_squared_error', optimizer='sgd')
 
