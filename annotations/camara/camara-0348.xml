@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
 <annotation>
   <folder>images</folder>
-  <filename>camara-0348.jpg</filename>
-  <path>images/camara-0348.jpg</path>
+  <filename>camara-0248.jpg</filename>
+  <path>images/camara-0248.jpg</path>
   <source>
     <database>Unknown</database>
   </source>
@@ -18,10 +18,10 @@
     <truncated>0</truncated>
     <difficult>0</difficult>
     <bndbox>
-      <xmin>0</xmin>
-      <ymin>395</ymin>
-      <xmax>1950</xmax>
-      <ymax>2355</ymax>
+      <xmin>5</xmin>
+      <ymin>535</ymin>
+      <xmax>2040</xmax>
+      <ymax>2790</ymax>
     </bndbox>
   </object>
 </annotation>
