@@ -123,17 +123,18 @@ for i in range(len(resized1)+len(resized2)+len(resized3)+len(resized4),len(resiz
 filenames = images1 + images2 + images3 + images4 + images5
 annotations = getXmlFilesAnnotations()
 bboxes = convertXmlAnnotationsToArray(annotations, filenames, True, False, True)
-print(bboxes)
+
 
 #%% RESIZE BBOXES (TO MATCH RESIZED IMAGES)
 resized_bboxes = bboxes
 
 for i in range(len(original_images)):
-    resized_bboxes[i][0] = (bboxes[i][0] * img_rows) / (original_images[i][0]) #z
-    resized_bboxes[i][1] = (bboxes[i][1] * img_cols) / (original_images[i][1]) #w
-    resized_bboxes[i][2] = (bboxes[i][2] * img_cols) / (original_images[i][1]) #x
-    resized_bboxes[i][3] = (bboxes[i][3] * img_rows) / (original_images[i][0]) #y
+    resized_bboxes[i][0] = (bboxes[i][0] * img_rows) / (original_images[i].shape[0]) #z
+    resized_bboxes[i][1] = (bboxes[i][1] * img_cols) / (original_images[i].shape[1]) #w
+    resized_bboxes[i][2] = (bboxes[i][2] * img_cols) / (original_images[i].shape[1]) #x
+    resized_bboxes[i][3] = (bboxes[i][3] * img_rows) / (original_images[i].shape[0]) #y
 
+resized_bboxes = list(np.around(np.array(resized_bboxes),2))
 
 #%% ONE HOT VECTORS
 
