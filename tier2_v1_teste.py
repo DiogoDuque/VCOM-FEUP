@@ -216,14 +216,26 @@ all_train_bboxes = np.vstack(L2)
 #all_train_bboxes = resized_bboxes + rotated1_bbox + rotated2_bbox + rotated3_bbox + higherint_bboxes + lowerint_bboxes
 
 
-all_train_images = np.asarray(all_train_images)
-all_train_labels = np.asarray(all_train_labels)
-all_train_bboxes = np.asarray(all_train_bboxes)
+#all_train_images = np.asarray(all_train_images)
+#all_train_labels = np.asarray(all_train_labels)
+#all_train_bboxes = np.asarray(all_train_bboxes)
 
 #%% CONCATENATE LABELS AND BBOXES
-all_train_labels_bbox = np.concatenate([all_train_bboxes, all_train_labels], axis=-1).reshape(num_samples, -1)
+all_train_labels_bbox = np.zeros((len(all_train_images),9)) #9 = bbox parameters (4) + label (5)
+
+for a in range(len(all_train_images)):
+    all_train_labels_bbox[a,0:4] = all_train_bboxes[a]
+    all_train_labels_bbox[a,4:9] = all_train_labels[a]
+
+
+#all_train_labels_bbox = np.asarray(all_train_labels_bbox)
+#all_train_labels_bbox = all_train_labels_bbox.reshape(num_samples, -1)
 
 reshaped_all_train_images = (all_train_images.reshape(num_samples, -1))
+#reshaped_all_train_images = np.rollaxis(all_train_images, 3, 1) #feature maps
+
+
+
 
 #%% MODEL
 
@@ -242,6 +254,13 @@ model.add(layers.Dense(all_train_labels_bbox.shape[-1]))
 # pass optimizer by name: default parameters will be used
 model.compile(loss='mean_squared_error', optimizer='sgd')
 
+#model = Sequential([
+#        Dense(40000, input_dim=reshaped_all_train_images.shape[-1]), 
+#        Activation('relu'), 
+#        Dropout(0.4), 
+#        Dense(all_train_labels_bbox.shape[-1])
+#    ])
+#model.compile('adadelta', 'mse')
 
 #%% EVAL
 def distance(bbox1, bbox2):
