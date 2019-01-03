@@ -26,12 +26,9 @@ if(fLines[-1]==""):
 testImgs = [[fLine.split(",")[0], fLine.split(",")[-1]] for fLine in fLines]
 
 # test!
-results = []
-for path in testImgs:
-    d = Dummy()
-    d.path = path[0]
-    res = predict(d)
-    results.append(res)
+d = Dummy()
+d.path = [ti[0] for ti in testImgs]
+results = predict(d)
 
 #print stuff
 #print(results)

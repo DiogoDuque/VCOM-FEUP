@@ -66,7 +66,7 @@ def predict_single_image(img_path, model_rpn, model_classifier_only, cfg, class_
     st = time.time()
     img = cv2.imread(img_path)
     if img is None:
-        print('reading image failed.')
+        print('reading image failed. from path: %s' % img_path)
         exit(0)
 
     X, ratio = format_img(img, cfg)
@@ -81,7 +81,7 @@ def predict_single_image(img_path, model_rpn, model_classifier_only, cfg, class_
     # convert from (x1,y1,x2,y2) to (x,y,w,h)
     result[:, 2] -= result[:, 0]
     result[:, 3] -= result[:, 1]
-    bbox_threshold = 0.8
+    bbox_threshold = 0.60
 
     # apply the spatial pyramid pooling to the proposed regions
     boxes = dict()
@@ -121,14 +121,18 @@ def predict_single_image(img_path, model_rpn, model_classifier_only, cfg, class_
             boxes[cls_num].append(
                 [cfg.rpn_stride * x, cfg.rpn_stride * y, cfg.rpn_stride * (x + w), cfg.rpn_stride * (y + h),
                  np.max(p_cls[0, ii, :])])
+    printStr = ""
     # add some nms to reduce many boxes
     for cls_num, box in boxes.items():
         boxes_nms = roi_helpers.non_max_suppression_fast(box, overlap_thresh=0.5)
         boxes[cls_num] = boxes_nms
-        print(class_mapping[cls_num] + ":")
+        #print(class_mapping[cls_num] + ":")
+        printStr = class_mapping[cls_num]
         for b in boxes_nms:
             b[0], b[1], b[2], b[3] = get_real_coordinates(ratio, b[0], b[1], b[2], b[3])
-            print('{} prob: {}'.format(b[0: 4], b[-1]))
+            printStr += " " + str(b[-1])
+            #print('{} prob: {}'.format(b[0: 4], b[-1]))
+    print(printStr if printStr else "Nothing found here")
     img = draw_boxes_and_label_on_image_cv2(img, class_mapping, boxes)
     print('Elapsed time = {}'.format(time.time() - st))
     #cv2.imshow('image', img)
@@ -178,7 +182,16 @@ def predict(args_):
     model_rpn.compile(optimizer='sgd', loss='mse')
     model_classifier.compile(optimizer='sgd', loss='mse')
 
-    if os.path.isdir(path):
+    if type(path) == list:
+        print("Doing custom batch prediction...")
+        predictions = []
+        count = 0
+        for p in path:
+            count += 1
+            print("Starting image %d of %d" % (count, len(path)))
+            predictions.append(predict_single_image(p, model_rpn, model_classifier_only, cfg, class_mapping))
+        return predictions
+    elif os.path.isdir(path):
         for idx, img_name in enumerate(sorted(os.listdir(path))):
             if not img_name.lower().endswith(('.bmp', '.jpeg', '.jpg', '.png', '.tif', '.tiff')):
                 continue
