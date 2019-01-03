@@ -13,9 +13,11 @@ import imutils
 #KERAS
 from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Activation, Flatten
+from keras.optimizers import SGD
 from keras.layers.convolutional import Convolution2D, MaxPooling2D
 from keras.optimizers import SGD,RMSprop,adam
 from keras.utils import np_utils
+from keras import layers
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -121,17 +123,18 @@ for i in range(len(resized1)+len(resized2)+len(resized3)+len(resized4),len(resiz
 filenames = images1 + images2 + images3 + images4 + images5
 annotations = getXmlFilesAnnotations()
 bboxes = convertXmlAnnotationsToArray(annotations, filenames, True, False, True)
-print(bboxes)
+
 
 #%% RESIZE BBOXES (TO MATCH RESIZED IMAGES)
 resized_bboxes = bboxes
 
 for i in range(len(original_images)):
-    resized_bboxes[i][0] = (bboxes[i][0] * img_rows) / (original_images[i][0]) #z
-    resized_bboxes[i][1] = (bboxes[i][1] * img_cols) / (original_images[i][1]) #w
-    resized_bboxes[i][2] = (bboxes[i][2] * img_cols) / (original_images[i][1]) #x
-    resized_bboxes[i][3] = (bboxes[i][3] * img_rows) / (original_images[i][0]) #y
+    resized_bboxes[i][0] = (bboxes[i][0] * img_rows) / (original_images[i].shape[0]) #z
+    resized_bboxes[i][1] = (bboxes[i][1] * img_cols) / (original_images[i].shape[1]) #w
+    resized_bboxes[i][2] = (bboxes[i][2] * img_cols) / (original_images[i].shape[1]) #x
+    resized_bboxes[i][3] = (bboxes[i][3] * img_rows) / (original_images[i].shape[0]) #y
 
+resized_bboxes = list(np.around(np.array(resized_bboxes),2))
 
 #%% ONE HOT VECTORS
 
@@ -204,27 +207,128 @@ for i in range(len(train_images)):
 
 #%% JOIN ALL IMAGES
 all_train_images = train_images + rotated1 + rotated2 + rotated3 + higherintensity + lowerintensity
-all_train_labels = train_labels + rotated1_labels + rotated2_labels + rotated3_labels + higherint_labels + lowerint_labels
-all_train_bboxes = resized_bboxes + rotated1_bbox + rotated2_bbox + rotated3_bbox + higherint_bboxes + lowerint_bboxes
+L1 = (train_labels,rotated1_labels,rotated2_labels,rotated3_labels,higherint_labels,lowerint_labels)
+all_train_labels = np.vstack(L1)
+#all_train_labels = np.concatenate(train_labels,rotated1_labels) #,rotated2_labels,rotated3_labels,higherint_labels,lowerint_labels)
 
-all_train_images = np.asarray(all_train_images)
-all_train_labels = np.asarray(all_train_labels)
-all_train_bboxes = np.asarray(all_train_bboxes)
+L2 = (resized_bboxes,rotated1_bbox,rotated2_bbox,rotated3_bbox,higherint_bboxes,lowerint_bboxes)
+all_train_bboxes = np.vstack(L2)
+#all_train_bboxes = resized_bboxes + rotated1_bbox + rotated2_bbox + rotated3_bbox + higherint_bboxes + lowerint_bboxes
+
+
+#all_train_images = np.asarray(all_train_images)
+#all_train_labels = np.asarray(all_train_labels)
+#all_train_bboxes = np.asarray(all_train_bboxes)
 
 #%% CONCATENATE LABELS AND BBOXES
-all_train_labels_bbox = np.concatenate([all_train_bboxes, all_train_labels], axis=-1).reshape(num_samples, -1)
-print(train_labels_bbox.shape)
+all_train_labels_bbox = np.zeros((len(all_train_images),9)) #9 = bbox parameters (4) + label (5)
+
+for a in range(len(all_train_images)):
+    all_train_labels_bbox[a,0:4] = all_train_bboxes[a]
+    all_train_labels_bbox[a,4:9] = all_train_labels[a]
+
+
+#all_train_labels_bbox = np.asarray(all_train_labels_bbox)
+#all_train_labels_bbox = all_train_labels_bbox.reshape(num_samples, -1)
+
+reshaped_all_train_images = (all_train_images.reshape(num_samples, -1))
+#reshaped_all_train_images = np.rollaxis(all_train_images, 3, 1) #feature maps
+
+
+
 
 #%% MODEL
 
 i = int(0.8 * num_samples)
-training_images = train_images[:i] #divide as imagens em train e test
-testing_images = train_images[i:]
-training_y = train_labels_bbox[:i]
-testing_y = train_labels_bbox[i:]
-test_bboxes = bboxes[i:]
+train_X = reshaped_all_train_images[:i] #divide as imagens em train e val
+test_X = reshaped_all_train_images[i:]
+train_y = all_train_labels_bbox[:i]
+test_y = all_train_labels_bbox[i:]
+
 
 model = Sequential()
-model.add(layers.Dense(1024, activation='relu'))
+model.add(layers.Dense(256, input_dim=reshaped_all_train_images.shape[-1]))
+model.add(Activation('relu'))
 model.add(layers.Dropout(0.4))
-model.add(layers.Dense(train_labels_bbox.shape[-1]))
+model.add(layers.Dense(all_train_labels_bbox.shape[-1]))
+# pass optimizer by name: default parameters will be used
+model.compile(loss='mean_squared_error', optimizer='sgd')
+
+#model = Sequential([
+#        Dense(40000, input_dim=reshaped_all_train_images.shape[-1]), 
+#        Activation('relu'), 
+#        Dropout(0.4), 
+#        Dense(all_train_labels_bbox.shape[-1])
+#    ])
+#model.compile('adadelta', 'mse')
+
+#%% EVAL
+def distance(bbox1, bbox2):
+    return np.sqrt(np.sum(np.square(bbox1[:2] - bbox2[:2])))
+
+def IOU(bbox1, bbox2):
+    '''Calculate overlap between two bounding boxes [x, y, w, h] as the area of intersection over the area of unity'''
+    x1, y1, w1, h1 = bbox1[0], bbox1[1], bbox1[2], bbox1[3]  
+    x2, y2, w2, h2 = bbox2[0], bbox2[1], bbox2[2], bbox2[3]
+
+    w_I = min(x1 + w1, x2 + w2) - max(x1, x2)
+    h_I = min(y1 + h1, y2 + h2) - max(y1, y2)
+    w_I = max(w_I, 0)  # set w_I and h_I zero if there is no intersection
+    h_I = max(h_I, 0)
+    I = w_I * h_I
+
+    U = w1 * h1 + w2 * h2 - I
+
+    return I / U
+
+
+#%% BACK TO MODEL
+    
+num_epochs = 50
+flipped_train_y = np.array(train_y)
+flipped = np.zeros((len(flipped_train_y), num_epochs))
+ious = np.zeros((len(flipped_train_y), num_epochs))
+dists = np.zeros((len(flipped_train_y), num_epochs))
+
+for epoch in range(num_epochs):
+    print ('Epoch', epoch)
+    model.fit(train_X, flipped_train_y, nb_epoch=1, validation_data=(test_X, test_y), verbose=2)
+    pred_y = model.predict(train_X)
+
+    for i, (pred_bboxes, exp_bboxes) in enumerate(zip(pred_y, flipped_train_y)):
+        
+        flipped_exp_bboxes = np.concatenate([exp_bboxes[4:], exp_bboxes[:4]])
+        
+        mse = np.mean(np.square(pred_bboxes - exp_bboxes))
+        mse_flipped = np.mean(np.square(pred_bboxes - flipped_exp_bboxes))
+        
+        iou = IOU(pred_bboxes[:4], exp_bboxes[:4]) + IOU(pred_bboxes[4:], exp_bboxes[4:])
+        iou_flipped = IOU(pred_bboxes[:4], flipped_exp_bboxes[:4]) + IOU(pred_bboxes[4:], flipped_exp_bboxes[4:])
+        
+        dist = distance(pred_bboxes[:4], exp_bboxes[:4]) + IOU(pred_bboxes[4:], exp_bboxes[4:])
+        dist_flipped = distance(pred_bboxes[:4], flipped_exp_bboxes[:4]) + IOU(pred_bboxes[4:], flipped_exp_bboxes[4:])
+        
+        if mse_flipped < mse:  # using iou or dist here leads to similar results
+            flipped_train_y[i] = flipped_exp_bboxes
+            flipped[i, epoch] = 1
+            ious[i, epoch] = iou_flipped / 2.
+            dists[i, epoch] = dist_flipped / 2.
+        else:
+            ious[i, epoch] = iou / 2.
+            dists[i, epoch] = dist / 2.
+            
+    print ('Flipped {} training samples ({} %)'.format(np.sum(flipped[:, epoch]), np.mean(flipped[:, epoch]) * 100.))
+    print ('Mean IOU: {}'.format(np.mean(ious[:, epoch])))
+    print ('Mean dist: {}'.format(np.mean(dists[:, epoch])))
+
+
+#%% Eval plots
+
+plt.plot(np.mean(ious, axis=0), label='Mean IOU')  # between predicted and assigned true bboxes
+plt.plot(np.mean(dists, axis=0), label='Mean distance')  # relative to image size
+plt.legend()
+plt.ylim(0, 1)
+
+
+
+
