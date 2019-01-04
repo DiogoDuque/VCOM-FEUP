@@ -31,7 +31,6 @@ def train_kitti():
     cfg.num_rois = 32
     cfg.base_net_weights = os.path.join('./model/', nn.get_weight_path())
 
-    # TODO: the only file should to be change for other data to train
     cfg.model_path = './model/kitti_frcnn_last.h5'
     cfg.simple_label_file = 'kitti_simple_label.txt'
 
@@ -106,7 +105,7 @@ def train_kitti():
                              metrics={'dense_class_{}'.format(len(classes_count)): 'accuracy'})
     model_all.compile(optimizer='sgd', loss='mae')
 
-    epoch_length = 51 #1000
+    epoch_length = 50 #1000
     num_epochs = 40 #int(cfg.num_epochs)
     iter_num = 0
 
