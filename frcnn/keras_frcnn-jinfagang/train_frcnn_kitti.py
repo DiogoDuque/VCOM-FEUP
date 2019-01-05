@@ -105,8 +105,8 @@ def train_kitti():
                              metrics={'dense_class_{}'.format(len(classes_count)): 'accuracy'})
     model_all.compile(optimizer='sgd', loss='mae')
 
-    epoch_length = 50 #1000
-    num_epochs = 40 #int(cfg.num_epochs)
+    epoch_length = 100 #1000
+    num_epochs = 15 #int(cfg.num_epochs)
     iter_num = 0
 
     losses = np.zeros((epoch_length, 5))

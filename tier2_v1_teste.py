@@ -180,7 +180,7 @@ rotated3_bbox = resized_bboxes[0:len(train_images)]
 rotated3_labels = train_labels[0:len(train_images)]
 #c) Flip 270 degrees
 for i in range(len(train_images)):
-   rotated2[i] = imutils.rotate_bound(train_images[i], 270)
+   rotated3[i] = imutils.rotate_bound(train_images[i], 270)
 
 rotated3_bbox[0]= resized_bboxes[1]
 rotated3_bbox[1]= img_rows - (resized_bboxes[3] + resized_bboxes[0])

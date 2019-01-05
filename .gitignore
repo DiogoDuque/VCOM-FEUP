@@ -108,3 +108,5 @@ venv.bak/
 annotations/
 
 images/
+
+frcnn/keras_frcnn-jinfagang/results_images/
