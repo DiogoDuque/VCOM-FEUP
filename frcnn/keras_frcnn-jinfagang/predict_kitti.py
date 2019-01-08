@@ -132,7 +132,7 @@ def predict_single_image(img_path, model_rpn, model_classifier_only, cfg, class_
             b[0], b[1], b[2], b[3] = get_real_coordinates(ratio, b[0], b[1], b[2], b[3])
             printStr += " " + str(b[-1])
             #print('{} prob: {}'.format(b[0: 4], b[-1]))
-    print(printStr if printStr else "Nothing found here")
+    #print(printStr if printStr else "Nothing found here")
     img = draw_boxes_and_label_on_image_cv2(img, class_mapping, boxes)
     print('Elapsed time = {}'.format(time.time() - st))
     #cv2.imshow('image', img)
