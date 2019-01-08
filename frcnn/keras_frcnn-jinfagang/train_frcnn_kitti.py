@@ -1,6 +1,3 @@
-"""
-this code will train on kitti data set
-"""
 from __future__ import division
 import random
 import pprint
@@ -31,7 +28,6 @@ def train_kitti():
     cfg.num_rois = 32
     cfg.base_net_weights = os.path.join('./model/', nn.get_weight_path())
 
-    # TODO: the only file should to be change for other data to train
     cfg.model_path = './model/kitti_frcnn_last.h5'
     cfg.simple_label_file = 'kitti_simple_label.txt'
 
@@ -53,7 +49,6 @@ def train_kitti():
     pprint.pprint(classes_count)
     print('Num classes (including bg) = {}'.format(len(classes_count)))
     random.shuffle(all_images)
-    num_imgs = len(all_images)
     train_imgs = [s for s in all_images if s['imageset'] == 'trainval']
     val_imgs = [s for s in all_images if s['imageset'] == 'test']
 
@@ -62,8 +57,6 @@ def train_kitti():
 
     data_gen_train = data_generators.get_anchor_gt(train_imgs, classes_count, cfg, nn.get_img_output_length,
                                                    K.image_dim_ordering(), mode='train')
-    data_gen_val = data_generators.get_anchor_gt(val_imgs, classes_count, cfg, nn.get_img_output_length,
-                                                 K.image_dim_ordering(), mode='val')
 
     if K.image_dim_ordering() == 'th':
         input_shape_img = (3, None, None)
@@ -97,8 +90,8 @@ def train_kitti():
         print('Could not load pretrained model weights. Weights can be found in the keras application folder '
               'https://github.com/fchollet/keras/tree/master/keras/applications')
 
-    optimizer = Adam(lr=1e-5)
-    optimizer_classifier = Adam(lr=1e-5)
+    optimizer = SGD(lr=1e-4)
+    optimizer_classifier = SGD(lr=1e-4)
     model_rpn.compile(optimizer=optimizer,
                       loss=[losses_fn.rpn_loss_cls(num_anchors), losses_fn.rpn_loss_regr(num_anchors)])
     model_classifier.compile(optimizer=optimizer_classifier,
@@ -106,8 +99,8 @@ def train_kitti():
                              metrics={'dense_class_{}'.format(len(classes_count)): 'accuracy'})
     model_all.compile(optimizer='sgd', loss='mae')
 
-    epoch_length = 40 #1000
-    num_epochs = 60 #int(cfg.num_epochs)
+    epoch_length = 700 #1000
+    num_epochs = 2 #int(cfg.num_epochs)
     iter_num = 0
 
     losses = np.zeros((epoch_length, 5))
@@ -117,10 +110,9 @@ def train_kitti():
 
     best_loss = np.Inf
 
-    class_mapping_inv = {v: k for k, v in class_mapping.items()}
     print('Starting training')
 
-    vis = True
+    infos = []
 
     for epoch_num in range(num_epochs):
 
@@ -242,6 +234,8 @@ def train_kitti():
                         best_loss = curr_loss
                         model_all.save_weights(cfg.model_path)
 
+                    infos.append({'accuracy': class_acc, 'loss_rpn_cls': loss_rpn_cls, 'loss_rpn_regr': loss_rpn_regr, 'loss_class_cls': loss_class_cls, 'loss_class_regr': loss_class_regr, 'best_loss': curr_loss})
+
                     break
 
             except Exception as e:
@@ -250,6 +244,8 @@ def train_kitti():
                 model_all.save_weights(cfg.model_path)
                 continue
     print('Training complete, exiting.')
+
+    print(infos)
 
 
 if __name__ == '__main__':

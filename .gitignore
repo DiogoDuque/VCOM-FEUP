@@ -104,3 +104,9 @@ venv.bak/
 .mypy_cache/
 
 \.vscode/
+
+annotations/
+
+images/
+
+frcnn/keras_frcnn-jinfagang/results_images/

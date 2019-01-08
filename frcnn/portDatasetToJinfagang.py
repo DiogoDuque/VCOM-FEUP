@@ -8,7 +8,7 @@ sys.path.append("..")
 from annotations_parser import getXmlFilesAnnotations, convertXmlAnnotationsToArray, _displayAnnotationsString
 
 datasetFolders = ['camara', 'musica', 'serralves', 'clerigos', 'arrabida']
-datasetRootPath = ".."
+datasetRootPath = os.path.join("..", "images")
 
 imagesPaths = []
 for folder in datasetFolders:
@@ -25,10 +25,10 @@ annotations = getXmlFilesAnnotations()
 bboxInfos, notFoundImgs = convertXmlAnnotationsToArray(annotations, imagesPaths, False, True)
 
 # delete images without annotations
-for notFound in notFoundImgs:
-    index = np.flatnonzero(np.core.defchararray.find(imagesPaths, notFound)!=-1)[0]
-    imagesPaths = np.delete(imagesPaths, index)
-    imagesLabels = np.delete(imagesLabels, index)
+#for notFound in notFoundImgs:
+#    index = np.flatnonzero(np.core.defchararray.find(imagesPaths, notFound)!=-1)[0]
+#    imagesPaths = np.delete(imagesPaths, index)
+#    imagesLabels = np.delete(imagesLabels, index)
 
 # reshape to prepare for concatenation
 imagesPaths = np.reshape(imagesPaths, [len(imagesPaths), 1])
@@ -46,7 +46,7 @@ for line in datasetLines:
 # separate into train and test
 print(len(datasetLinesStr))
 random.seed()
-lenTestElems = int(0.2*len(datasetLinesStr))
+lenTestElems = int(0.1*len(datasetLinesStr))
 testDataset = []
 for i in range(lenTestElems):
     index = random.randint(0, len(datasetLinesStr))
